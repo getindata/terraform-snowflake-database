@@ -1,0 +1,22 @@
+descriptor_formats = {
+  snowflake-role = {
+    labels = ["attributes", "name"]
+    format = "%v_%v"
+  }
+  snowflake-database = {
+    labels = ["environment", "name", "attributes"]
+    format = "%v_%v_%v"
+  }
+  snowflake-schema = {
+    labels = ["name", "attributes"]
+    format = "%v_%v"
+  }
+  snowflake-resource-monitor = {
+    labels = ["name", "attributes"]
+    format = "%v_%v"
+  }
+}
+
+tags = {
+  Terraform = "True"
+}
