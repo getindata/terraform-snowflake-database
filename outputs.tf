@@ -9,7 +9,7 @@ output "data_retention_time_in_days" {
 }
 
 output "is_transient" {
-  description = "Is databse database"
+  description = "Is databse transient"
   value       = one(snowflake_database.this[*].is_transient)
 }
 

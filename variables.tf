@@ -17,7 +17,7 @@ variable "data_retention_time_in_days" {
 }
 
 variable "is_transient" {
-  description = " Specifies a database as transient. Transient databases do not have a Fail-safe period so they do not incur additional storage costs once they leave Time Travel; however, this means they are also not protected by Fail-safe in the event of a data loss"
+  description = "Specifies a database as transient. Transient databases do not have a Fail-safe period so they do not incur additional storage costs once they leave Time Travel; however, this means they are also not protected by Fail-safe in the event of a data loss"
   type        = bool
   default     = false
 }

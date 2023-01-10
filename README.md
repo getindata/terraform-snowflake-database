@@ -2,8 +2,6 @@
 ![Snowflake](https://img.shields.io/badge/-SNOWFLAKE-249edc?style=for-the-badge&logo=snowflake&logoColor=white)
 ![Terraform](https://img.shields.io/badge/terraform-%235835CC.svg?style=for-the-badge&logo=terraform&logoColor=white)
 
-
-<!--- Replace repository name -->
 ![License](https://badgen.net/github/license/getindata/terraform-snowflake-database/)
 ![Release](https://badgen.net/github/release/getindata/terraform-snowflake-database/)
 
@@ -20,8 +18,8 @@ Terraform module for Snowflake database management.
 * Can create custom Snowflake roles with role-to-role, role-to-user assignments
 * Can create a set of default roles to simplify access management:
     * `READONLY` - granted 
-    * `ADMIN` - Full access, including datbase options like `data_retention_time_in_days`
-* Can create number of schems in the database with their specific access roles
+    * `ADMIN` - Full access, including database options like `data_retention_time_in_days`
+* Can create number of schemas in the database with their specific access roles
 
 ## USAGE
 
@@ -97,7 +95,7 @@ module "snowflake_database" {
 | Name | Description |
 |------|-------------|
 | <a name="output_data_retention_time_in_days"></a> [data\_retention\_time\_in\_days](#output\_data\_retention\_time\_in\_days) | Data retention days for the database |
-| <a name="output_is_transient"></a> [is\_transient](#output\_is\_transient) | Is databse database |
+| <a name="output_is_transient"></a> [is\_transient](#output\_is\_transient) | Is databse transient |
 | <a name="output_name"></a> [name](#output\_name) | Name of the database |
 | <a name="output_roles"></a> [roles](#output\_roles) | Snowflake Database roles |
 | <a name="output_schemas"></a> [schemas](#output\_schemas) | This database schemas |
