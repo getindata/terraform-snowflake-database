@@ -38,8 +38,8 @@ module "snowflake_database" {
 
 ## EXAMPLES
 
-- [Complete](examples/complete) - Advanced usage of the module
 - [Simple](examples/simple) - Basic usage of the module
+- [Complete](examples/complete) - Advanced usage of the module
 
 <!-- BEGIN_TF_DOCS -->
 
