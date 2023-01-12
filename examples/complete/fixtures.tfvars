@@ -11,7 +11,7 @@ descriptor_formats = {
     labels = ["name", "attributes"]
     format = "%v_%v"
   }
-  snowflake-resource-monitor = {
+  snowflake-stage = {
     labels = ["name", "attributes"]
     format = "%v_%v"
   }

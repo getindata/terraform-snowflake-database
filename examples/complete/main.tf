@@ -41,6 +41,9 @@ module "prod_database" {
 
   schemas = {
     bronze = {
+      stages = {
+        example = {}
+      }
       roles = {
         admin = {
           granted_to_roles = [module.snowflake_admin_role.name]
