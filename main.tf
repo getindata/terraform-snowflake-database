@@ -61,7 +61,7 @@ module "snowflake_schema" {
   for_each = var.schemas
 
   source  = "getindata/schema/snowflake"
-  version = "1.0.1"
+  version = "1.1.0"
   context = module.this.context
 
   name     = each.key
@@ -70,6 +70,8 @@ module "snowflake_schema" {
   data_retention_days = each.value.data_retention_days
   is_transient        = each.value.is_transient
   is_managed          = each.value.is_managed
+
+  stages = each.value.stages
 
   create_default_roles = coalesce(each.value.create_default_roles, var.create_default_roles)
   roles                = each.value.roles
