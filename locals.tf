@@ -5,15 +5,33 @@ locals {
     lookup(module.database_label.descriptors, var.descriptor_name, module.database_label.id), "/${module.database_label.delimiter}${module.database_label.delimiter}+/", module.database_label.delimiter
   ), module.database_label.delimiter) : null
 
+  enabled              = module.this.enabled
   create_default_roles = module.this.enabled && var.create_default_roles
 
+  #This needs to be the same as an object in roles variable
+  role_template = {
+    enabled              = true
+    descriptor_name      = "snowflake-role"
+    comment              = null
+    role_ownership_grant = "SYSADMIN"
+    granted_roles        = []
+    granted_to_roles     = []
+    granted_to_users     = []
+    database_grants      = []
+    schema_grants        = []
+  }
   default_roles_definition = {
     readonly = {
       database_grants = ["USAGE", "MONITOR"]
+      database_grants = ["USAGE"]
+    }
+    transformer = {
+      database_grants = ["USAGE", "MONITOR", "CREATE SCHEMA"]
+      schema_grants   = ["USAGE", "CREATE TEMPORARY TABLE", "CREATE TAG", "CREATE PIPE", "CREATE PROCEDURE", "CREATE MATERIALIZED VIEW", "CREATE TABLE", "CREATE FILE FORMAT", "CREATE STAGE", "CREATE TASK", "CREATE FUNCTION", "CREATE EXTERNAL TABLE", "CREATE SEQUENCE", "CREATE VIEW", "CREATE STREAM"]
     }
     admin = {
-      database_grants = ["USAGE", "MONITOR", "MODIFY", "OWNERSHIP", "REFERENCE_USAGE", "CREATE SCHEMA"]
-      schema_grants   = ["MONITOR", "CREATE TEMPORARY TABLE", "CREATE TAG", "CREATE PIPE", "CREATE PROCEDURE", "CREATE MATERIALIZED VIEW", "CREATE ROW ACCESS POLICY", "USAGE", "CREATE TABLE", "CREATE FILE FORMAT", "CREATE STAGE", "CREATE TASK", "CREATE FUNCTION", "CREATE EXTERNAL TABLE", "ADD SEARCH OPTIMIZATION", "MODIFY", "OWNERSHIP", "CREATE SEQUENCE", "CREATE MASKING POLICY", "CREATE VIEW", "CREATE STREAM"]
+      database_grants = ["USAGE", "MONITOR", "MODIFY", "REFERENCE_USAGE", "CREATE SCHEMA"]
+      schema_grants   = ["USAGE", "MONITOR", "MODIFY", "CREATE TEMPORARY TABLE", "CREATE TAG", "CREATE PIPE", "CREATE PROCEDURE", "CREATE MATERIALIZED VIEW", "CREATE ROW ACCESS POLICY", "CREATE TABLE", "CREATE FILE FORMAT", "CREATE STAGE", "CREATE TASK", "CREATE FUNCTION", "CREATE EXTERNAL TABLE", "ADD SEARCH OPTIMIZATION", "CREATE SEQUENCE", "CREATE MASKING POLICY", "CREATE VIEW", "CREATE STREAM"]
     }
   }
 
@@ -21,12 +39,19 @@ locals {
     for k, v in role : k => v
     if v != null
   } }
-  roles_definition = module.roles_deep_merge.merged
+
+  roles_definition = {
+    for role_name, role in module.roles_deep_merge.merged : role_name => merge(
+      local.role_template,
+      role
+    )
+  }
 
   default_roles = {
     for role_name, role in local.roles_definition : role_name => role
     if contains(keys(local.default_roles_definition), role_name)
   }
+
   custom_roles = {
     for role_name, role in local.roles_definition : role_name => role
     if !contains(keys(local.default_roles_definition), role_name)
@@ -39,6 +64,8 @@ locals {
     ) : role_name => role
     if role.name != null
   }
+
+  schemas = var.schemas
 }
 
 module "roles_deep_merge" {

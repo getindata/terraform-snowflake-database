@@ -27,49 +27,55 @@ module "snowflake_default_role" {
 
   source  = "getindata/role/snowflake"
   version = "1.0.3"
-  context = module.this.context
-  enabled = local.create_default_roles && lookup(each.value, "enabled", true)
+
+  context         = module.this.context
+  enabled         = local.create_default_roles && each.value.enabled
+  descriptor_name = each.value.descriptor_name
 
   name       = each.key
   attributes = [one(snowflake_database.this[*].name)]
 
-  role_ownership_grant = lookup(each.value, "role_ownership_grant", "SYSADMIN")
-  granted_to_users     = lookup(each.value, "granted_to_users", [])
-  granted_to_roles     = lookup(each.value, "granted_to_roles", [])
-  granted_roles        = lookup(each.value, "granted_roles", [])
+  role_ownership_grant = each.value.role_ownership_grant
+  granted_to_users     = each.value.granted_to_users
+  granted_to_roles     = each.value.granted_to_roles
+  granted_roles        = each.value.granted_roles
 }
-
 
 module "snowflake_custom_role" {
   for_each = local.custom_roles
 
   source  = "getindata/role/snowflake"
   version = "1.0.3"
-  context = module.this.context
-  enabled = module.this.enabled && lookup(each.value, "enabled", true)
+
+  context         = local.enabled
+  enabled         = module.this.enabled && each.value.enabled
+  descriptor_name = each.value.descriptor_name
 
   name       = each.key
   attributes = [one(snowflake_database.this[*].name)]
 
-  role_ownership_grant = lookup(each.value, "role_ownership_grant", "SYSADMIN")
-  granted_to_users     = lookup(each.value, "granted_to_users", [])
-  granted_to_roles     = lookup(each.value, "granted_to_roles", [])
-  granted_roles        = lookup(each.value, "granted_roles", [])
+  role_ownership_grant = each.value.role_ownership_grant
+  granted_to_users     = each.value.granted_to_users
+  granted_to_roles     = each.value.granted_to_roles
+  granted_roles        = each.value.granted_roles
 }
 
 module "snowflake_schema" {
-  for_each = var.schemas
+  for_each = local.schemas
 
   source  = "getindata/schema/snowflake"
-  version = "1.1.0"
+  version = "1.3.0"
+
   context = module.this.context
+  enabled = each.value.enabled
 
   name     = each.key
   database = one(snowflake_database.this[*].name)
 
-  data_retention_days = each.value.data_retention_days
-  is_transient        = each.value.is_transient
-  is_managed          = each.value.is_managed
+  skip_schema_creation = each.value.skip_schema_creation
+  data_retention_days  = each.value.data_retention_days
+  is_transient         = each.value.is_transient
+  is_managed           = each.value.is_managed
 
   stages = each.value.stages
 
