@@ -53,6 +53,7 @@ variable "roles" {
   description = "Roles created in the database scope"
   type = map(object({
     enabled              = optional(bool, true)
+    descriptor_name      = optional(string, "snowflake-role")
     comment              = optional(string)
     role_ownership_grant = optional(string)
     granted_roles        = optional(list(string))
@@ -67,11 +68,13 @@ variable "roles" {
 variable "schemas" {
   description = "Schemas to be created in the database"
   type = map(object({
-    descriptor_name     = optional(string, "snowflake-schema")
-    comment             = optional(string)
-    data_retention_days = optional(number, 1)
-    is_transient        = optional(bool, false)
-    is_managed          = optional(bool, false)
+    enabled              = optional(bool, true)
+    skip_schema_creation = optional(bool, false)
+    descriptor_name      = optional(string, "snowflake-schema")
+    comment              = optional(string)
+    data_retention_days  = optional(number, 1)
+    is_transient         = optional(bool, false)
+    is_managed           = optional(bool, false)
     stages = optional(map(object({
       enabled              = optional(bool, true)
       descriptor_name      = optional(string, "snowflake-stage")
@@ -88,6 +91,7 @@ variable "schemas" {
       create_default_roles = optional(bool)
       roles = optional(map(object({
         enabled              = optional(bool, true)
+        descriptor_name      = optional(string, "snowflake-role")
         comment              = optional(string)
         role_ownership_grant = optional(string)
         granted_roles        = optional(list(string))
@@ -99,6 +103,7 @@ variable "schemas" {
     create_default_roles = optional(bool)
     roles = optional(map(object({
       enabled                  = optional(bool, true)
+      descriptor_name          = optional(string, "snowflake-role")
       comment                  = optional(string)
       role_ownership_grant     = optional(string)
       granted_roles            = optional(list(string))
