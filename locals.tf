@@ -6,7 +6,7 @@ locals {
   ), module.database_label.delimiter) : null
 
   enabled              = module.this.enabled
-  create_default_roles = module.this.enabled && var.create_default_roles
+  create_default_roles = local.enabled && var.create_default_roles
 
   #This needs to be the same as an object in roles variable
   role_template = {
