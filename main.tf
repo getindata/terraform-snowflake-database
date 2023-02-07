@@ -47,8 +47,8 @@ module "snowflake_custom_role" {
   source  = "getindata/role/snowflake"
   version = "1.0.3"
 
-  context         = local.enabled
-  enabled         = module.this.enabled && each.value.enabled
+  context         = module.this.context
+  enabled         = local.enabled && each.value.enabled
   descriptor_name = each.value.descriptor_name
 
   name       = each.key
@@ -66,8 +66,9 @@ module "snowflake_schema" {
   source  = "getindata/schema/snowflake"
   version = "1.3.0"
 
-  context = module.this.context
-  enabled = each.value.enabled
+  context         = module.this.context
+  enabled         = local.enabled && each.value.enabled
+  descriptor_name = each.value.descriptor_name
 
   name     = each.key
   database = one(snowflake_database.this[*].name)
@@ -84,7 +85,7 @@ module "snowflake_schema" {
 }
 
 resource "snowflake_database_grant" "this" {
-  for_each = module.this.enabled ? transpose({ for role_name, role in local.roles : local.roles[role_name].name =>
+  for_each = local.enabled ? transpose({ for role_name, role in local.roles : local.roles[role_name].name =>
     lookup(local.roles_definition[role_name], "database_grants", [])
     if lookup(local.roles_definition[role_name], "enabled", true)
   }) : {}
@@ -95,7 +96,7 @@ resource "snowflake_database_grant" "this" {
 }
 
 resource "snowflake_schema_grant" "this" {
-  for_each = module.this.enabled ? transpose({ for role_name, role in local.roles : local.roles[role_name].name =>
+  for_each = local.enabled ? transpose({ for role_name, role in local.roles : local.roles[role_name].name =>
     lookup(local.roles_definition[role_name], "schema_grants", [])
     if lookup(local.roles_definition[role_name], "enabled", true)
   }) : {}
