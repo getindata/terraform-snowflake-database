@@ -64,7 +64,7 @@ module "snowflake_schema" {
   for_each = local.schemas
 
   source  = "getindata/schema/snowflake"
-  version = "1.4.0"
+  version = "1.5.0"
 
   context         = module.this.context
   enabled         = local.enabled && each.value.enabled
@@ -80,8 +80,9 @@ module "snowflake_schema" {
 
   stages = each.value.stages
 
-  create_default_roles = coalesce(each.value.create_default_roles, var.create_default_roles)
-  roles                = each.value.roles
+  create_default_roles           = coalesce(each.value.create_default_roles, var.create_default_roles)
+  add_grants_to_existing_objects = coalesce(each.value.add_grants_to_existing_objects, false)
+  roles                          = each.value.roles
 }
 
 resource "snowflake_database_grant" "this" {
