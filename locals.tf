@@ -23,7 +23,7 @@ locals {
   default_roles_definition = {
     readonly = {
       database_grants = ["USAGE", "MONITOR"]
-      database_grants = ["USAGE"]
+      schema_grants   = ["USAGE"]
     }
     transformer = {
       database_grants = ["USAGE", "MONITOR", "CREATE SCHEMA"]
