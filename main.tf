@@ -26,7 +26,7 @@ module "snowflake_default_role" {
   for_each = local.default_roles
 
   source  = "getindata/role/snowflake"
-  version = "1.0.3"
+  version = "1.4.0"
 
   context         = module.this.context
   enabled         = local.create_default_roles && each.value.enabled
@@ -45,7 +45,7 @@ module "snowflake_custom_role" {
   for_each = local.custom_roles
 
   source  = "getindata/role/snowflake"
-  version = "1.0.3"
+  version = "1.4.0"
 
   context         = module.this.context
   enabled         = local.enabled && each.value.enabled
@@ -104,6 +104,18 @@ resource "snowflake_schema_grant" "this" {
 
   database_name = one(snowflake_database.this[*].name)
   on_future     = true
+  privilege     = each.key
+  roles         = each.value
+}
+
+resource "snowflake_schema_grant" "existing" {
+  for_each = local.enabled ? transpose({ for role_name, role in local.roles : local.roles[role_name].name =>
+    lookup(local.roles_definition[role_name], "schema_grants", [])
+    if lookup(local.roles_definition[role_name], "enabled", true)
+  }) : {}
+
+  database_name = one(snowflake_database.this[*].name)
+  on_all        = true
   privilege     = each.key
   roles         = each.value
 }
