@@ -124,11 +124,26 @@ When upgrading from `v1.x`, expect most of the resources to be recreated - if re
 
 | Name | Description |
 |------|-------------|
+| <a name="output_catalog"></a> [catalog](#output\_catalog) | The database parameter that specifies the default catalog to use for Iceberg tables |
 | <a name="output_data_retention_time_in_days"></a> [data\_retention\_time\_in\_days](#output\_data\_retention\_time\_in\_days) | Data retention days for the database |
-| <a name="output_is_transient"></a> [is\_transient](#output\_is\_transient) | Is databse transient |
+| <a name="output_default_ddl_collation"></a> [default\_ddl\_collation](#output\_default\_ddl\_collation) | Specifies a default collation specification for all schemas and tables added to the database. |
+| <a name="output_enable_console_output"></a> [enable\_console\_output](#output\_enable\_console\_output) | If true, enables stdout/stderr fast path logging for anonymous stored procedures |
+| <a name="output_external_volume"></a> [external\_volume](#output\_external\_volume) | The database parameter that specifies the default external volume to use for Iceberg tables |
+| <a name="output_is_transient"></a> [is\_transient](#output\_is\_transient) | Specifies a database as transient. Transient databases do not have a Fail-safe period so they do not incur additional storage costs once they leave Time Travel; however, this means they are also not protected by Fail-safe in the event of a data loss |
+| <a name="output_log_level"></a> [log\_level](#output\_log\_level) | Specifies the severity level of messages that should be ingested and made available in the active event table. Valid options are: [TRACE DEBUG INFO WARN ERROR FATAL OFF] |
+| <a name="output_max_data_extension_time_in_days"></a> [max\_data\_extension\_time\_in\_days](#output\_max\_data\_extension\_time\_in\_days) | Object parameter that specifies the maximum number of days for which Snowflake can extend the data retention period for tables in the database to prevent streams on the tables from becoming stale |
 | <a name="output_name"></a> [name](#output\_name) | Name of the database |
+| <a name="output_quoted_identifiers_ignore_case"></a> [quoted\_identifiers\_ignore\_case](#output\_quoted\_identifiers\_ignore\_case) | If true, the case of quoted identifiers is ignored |
+| <a name="output_replace_invalid_characters"></a> [replace\_invalid\_characters](#output\_replace\_invalid\_characters) | Specifies whether to replace invalid UTF-8 characters with the Unicode replacement character () in query results for an Iceberg table |
 | <a name="output_roles"></a> [roles](#output\_roles) | Snowflake Database roles |
 | <a name="output_schemas"></a> [schemas](#output\_schemas) | This database schemas |
+| <a name="output_storage_serialization_policy"></a> [storage\_serialization\_policy](#output\_storage\_serialization\_policy) | The storage serialization policy for Iceberg tables that use Snowflake as the catalog. Valid options are: [COMPATIBLE OPTIMIZED] |
+| <a name="output_suspend_task_after_num_failures"></a> [suspend\_task\_after\_num\_failures](#output\_suspend\_task\_after\_num\_failures) | How many times a task must fail in a row before it is automatically suspended. 0 disables auto-suspending |
+| <a name="output_task_auto_retry_attempts"></a> [task\_auto\_retry\_attempts](#output\_task\_auto\_retry\_attempts) | Maximum automatic retries allowed for a user task |
+| <a name="output_trace_level"></a> [trace\_level](#output\_trace\_level) | Controls how trace events are ingested into the event table. Valid options are: [ALWAYS ON\_EVENT OFF] |
+| <a name="output_user_task_managed_initial_warehouse_size"></a> [user\_task\_managed\_initial\_warehouse\_size](#output\_user\_task\_managed\_initial\_warehouse\_size) | The initial size of warehouse to use for managed warehouses in the absence of history |
+| <a name="output_user_task_minimum_trigger_interval_in_seconds"></a> [user\_task\_minimum\_trigger\_interval\_in\_seconds](#output\_user\_task\_minimum\_trigger\_interval\_in\_seconds) | Minimum amount of time between Triggered Task executions in seconds |
+| <a name="output_user_task_timeout_ms"></a> [user\_task\_timeout\_ms](#output\_user\_task\_timeout\_ms) | User task execution timeout in milliseconds |
 
 ## Providers
 
