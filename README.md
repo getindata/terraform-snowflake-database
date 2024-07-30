@@ -17,7 +17,7 @@ Terraform module for Snowflake database management.
 * Creates Snowflake database
 * Can create custom Snowflake database roles with role-to-role and role-to-user assignments
 * Can create a set of default database roles to simplify access management:
-    * `READONLY` - granted `USAGE` and `MONITOR' privileges on the database
+    * `READONLY` - granted `USAGE` and `MONITOR` privileges on the database
     * `TRANSFORMER` - allows creating schemas and some Snowflake objects in them
     * `ADMIN` - full access, including database options like `data_retention_time_in_days`
 * Can create number of schemas in the database with their specific stages and access roles
