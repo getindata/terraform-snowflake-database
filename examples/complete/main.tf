@@ -4,18 +4,12 @@ resource "snowflake_user" "dbt" {
   comment    = "DBT user."
 }
 
-module "snowflake_admin_role" {
-  source  = "getindata/role/snowflake"
-  version = "1.0.3"
-  context = module.this.context
-  name    = "admin"
+resource "snowflake_account_role" "admin_role" {
+  name = "admin"
 }
 
-module "snowflake_dev_role" {
-  source  = "getindata/role/snowflake"
-  version = "1.0.3"
-  context = module.this.context
-  name    = "dev"
+resource "snowflake_account_role" "dev_role" {
+  name = "dev"
 }
 
 module "prod_database" {
@@ -32,50 +26,46 @@ module "prod_database" {
 
   roles = {
     readonly = {
-      granted_to_roles = [module.snowflake_dev_role.name]
+      granted_to_roles = [snowflake_account_role.dev_role.name]
+    }
+    transformer = {
+      enabled = false
     }
     admin = {
-      granted_to_roles = [module.snowflake_admin_role.name]
+      granted_to_roles = [snowflake_account_role.admin_role.name]
     }
   }
 
   schemas = {
     bronze = {
+      data_retention_time_in_days = 7
       stages = {
-        example = {}
+        example = {
+          comment = "my example stage"
+        }
       }
       roles = {
         admin = {
-          granted_to_roles = [module.snowflake_admin_role.name]
+          granted_to_roles = [snowflake_account_role.admin_role.name]
         }
         readonly = {
-          granted_to_roles = [module.snowflake_dev_role.name]
+          granted_to_roles = [snowflake_account_role.dev_role.name]
         }
       }
     }
     silver = {
       roles = {
         admin = {
-          granted_to_roles = [module.snowflake_admin_role.name]
+          granted_to_roles = [snowflake_account_role.admin_role.name]
         }
       }
     }
     gold = {
       roles = {
         admin = {
-          granted_to_roles = [module.snowflake_admin_role.name]
+          granted_to_roles = [snowflake_account_role.admin_role.name]
         }
       }
     }
   }
-}
-
-
-module "dev_database" {
-  source      = "../../"
-  context     = module.this.context
-  environment = "dev"
-
-  name          = "analytics"
-  from_database = module.prod_database.name
 }

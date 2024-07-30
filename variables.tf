@@ -13,7 +13,13 @@ variable "comment" {
 variable "data_retention_time_in_days" {
   description = "Number of days for which Snowflake retains historical data for performing Time Travel actions (SELECT, CLONE, UNDROP) on the object. A value of 0 effectively disables Time Travel for the specified database, schema, or table"
   type        = number
-  default     = 1
+  default     = null
+}
+
+variable "max_data_extension_time_in_days" {
+  description = "Object parameter that specifies the maximum number of days for which Snowflake can extend the data retention period for tables in the database to prevent streams on the tables from becoming stale"
+  type        = number
+  default     = null
 }
 
 variable "is_transient" {
@@ -22,29 +28,92 @@ variable "is_transient" {
   default     = false
 }
 
-variable "from_database" {
-  description = "Specify a database to create a clone from"
+variable "external_volume" {
+  description = "The database parameter that specifies the default external volume to use for Iceberg tables"
   type        = string
   default     = null
 }
 
-variable "from_replica" {
-  description = "Specify a fully-qualified path to a database to create a replica from"
+variable "catalog" {
+  description = "The database parameter that specifies the default catalog to use for Iceberg tables"
   type        = string
   default     = null
 }
 
-variable "from_share" {
-  description = "Specify a provider and a share in this map to create a database from a share"
-  type = object({
-    provider = string
-    share    = string
-  })
-  default = null
+variable "replace_invalid_characters" {
+  description = "Specifies whether to replace invalid UTF-8 characters with the Unicode replacement character () in query results for an Iceberg table"
+  type        = bool
+  default     = false
+}
+
+variable "default_ddl_collation" {
+  description = "Specifies a default collation specification for all schemas and tables added to the database."
+  type        = string
+  default     = null
+}
+
+variable "storage_serialization_policy" {
+  description = "The storage serialization policy for Iceberg tables that use Snowflake as the catalog. Valid options are: [COMPATIBLE OPTIMIZED]"
+  type        = string
+  default     = null
+}
+
+variable "log_level" {
+  description = "Specifies the severity level of messages that should be ingested and made available in the active event table. Valid options are: [TRACE DEBUG INFO WARN ERROR FATAL OFF]"
+  type        = string
+  default     = null
+}
+
+variable "trace_level" {
+  description = "Controls how trace events are ingested into the event table. Valid options are: [ALWAYS ON_EVENT OFF]"
+  type        = string
+  default     = null
+}
+
+variable "suspend_task_after_num_failures" {
+  description = "How many times a task must fail in a row before it is automatically suspended. 0 disables auto-suspending"
+  type        = number
+  default     = null
+}
+
+variable "task_auto_retry_attempts" {
+  description = "Maximum automatic retries allowed for a user task"
+  type        = number
+  default     = null
+}
+
+variable "user_task_managed_initial_warehouse_size" {
+  description = "The initial size of warehouse to use for managed warehouses in the absence of history"
+  type        = string
+  default     = null
+}
+
+variable "user_task_minimum_trigger_interval_in_seconds" {
+  description = "Minimum amount of time between Triggered Task executions in seconds"
+  type        = number
+  default     = null
+}
+
+variable "user_task_timeout_ms" {
+  description = "User task execution timeout in milliseconds"
+  type        = number
+  default     = null
+}
+
+variable "quoted_identifiers_ignore_case" {
+  description = "If true, the case of quoted identifiers is ignored"
+  type        = bool
+  default     = false
+}
+
+variable "enable_console_output" {
+  description = "If true, enables stdout/stderr fast path logging for anonymous stored procedures"
+  type        = bool
+  default     = false
 }
 
 variable "create_default_roles" {
-  description = "Whether the default roles should be created"
+  description = "Whether the default database roles should be created"
   type        = bool
   default     = false
 }
@@ -59,8 +128,19 @@ variable "roles" {
     granted_roles        = optional(list(string))
     granted_to_roles     = optional(list(string))
     granted_to_users     = optional(list(string))
-    database_grants      = optional(list(string))
-    schema_grants        = optional(list(string))
+    database_grants = optional(object({
+      all_privileges    = optional(bool)
+      with_grant_option = optional(bool, false)
+      privileges        = optional(list(string), null)
+    }))
+    schema_grants = optional(list(object({
+      all_privileges             = optional(bool)
+      with_grant_option          = optional(bool, false)
+      privileges                 = optional(list(string), null)
+      all_schemas_in_database    = optional(bool, false)
+      future_schemas_in_database = optional(bool, false)
+      schema_name                = optional(string, null)
+    })))
   }))
   default = {}
 }
@@ -68,13 +148,29 @@ variable "roles" {
 variable "schemas" {
   description = "Schemas to be created in the database"
   type = map(object({
-    enabled              = optional(bool, true)
-    skip_schema_creation = optional(bool, false)
-    descriptor_name      = optional(string, "snowflake-schema")
-    comment              = optional(string)
-    data_retention_days  = optional(number, 1)
-    is_transient         = optional(bool, false)
-    is_managed           = optional(bool, false)
+    enabled                                       = optional(bool, true)
+    skip_schema_creation                          = optional(bool, false)
+    descriptor_name                               = optional(string, "snowflake-schema")
+    comment                                       = optional(string, null)
+    data_retention_days_time_in_days              = optional(number, 1)
+    max_data_extension_time_in_days               = optional(number, null)
+    is_transient                                  = optional(bool, false)
+    with_managed_access                           = optional(bool, false)
+    external_volume                               = optional(string, null)
+    catalog                                       = optional(string, null)
+    replace_invalid_characters                    = optional(bool, false)
+    default_ddl_collation                         = optional(string, null)
+    storage_serialization_policy                  = optional(string, null)
+    log_level                                     = optional(string, null)
+    trace_level                                   = optional(string, null)
+    suspend_task_after_num_failures               = optional(number, null)
+    task_auto_retry_attempts                      = optional(number, null)
+    user_task_managed_initial_warehouse_size      = optional(string, null)
+    user_task_timeout_ms                          = optional(number, null)
+    user_task_minimum_trigger_interval_in_seconds = optional(number, null)
+    quoted_identifiers_ignore_case                = optional(bool, false)
+    enable_console_output                         = optional(bool, false)
+    pipe_execution_paused                         = optional(bool, false)
     stages = optional(map(object({
       enabled              = optional(bool, true)
       descriptor_name      = optional(string, "snowflake-stage")
@@ -97,32 +193,44 @@ variable "schemas" {
         granted_roles        = optional(list(string))
         granted_to_roles     = optional(list(string))
         granted_to_users     = optional(list(string))
-        stage_grants         = optional(list(string))
+        schema_grants = optional(list(object({
+          all_privileges             = optional(bool)
+          with_grant_option          = optional(bool, false)
+          privileges                 = optional(list(string), null)
+          all_schemas_in_database    = optional(bool, false)
+          future_schemas_in_database = optional(bool, false)
+          schema_name                = optional(string, null)
+        })))
       })), {})
     })), {})
-    create_default_roles           = optional(bool)
-    add_grants_to_existing_objects = optional(bool)
+    create_default_roles = optional(bool)
     roles = optional(map(object({
-      enabled                        = optional(bool, true)
-      descriptor_name                = optional(string, "snowflake-role")
-      comment                        = optional(string)
-      role_ownership_grant           = optional(string)
-      granted_roles                  = optional(list(string))
-      granted_to_roles               = optional(list(string))
-      granted_to_users               = optional(list(string))
-      add_grants_to_existing_objects = optional(bool)
-      schema_grants                  = optional(list(string))
-      table_grants                   = optional(list(string))
-      external_table_grants          = optional(list(string))
-      view_grants                    = optional(list(string))
-      materialized_view_grants       = optional(list(string))
-      file_format_grants             = optional(list(string))
-      function_grants                = optional(list(string))
-      stage_grants                   = optional(list(string))
-      task_grants                    = optional(list(string))
-      procedure_grants               = optional(list(string))
-      sequence_grants                = optional(list(string))
-      stream_grants                  = optional(list(string))
+      enabled              = optional(bool, true)
+      descriptor_name      = optional(string, "snowflake-role")
+      comment              = optional(string)
+      role_ownership_grant = optional(string)
+      granted_roles        = optional(list(string))
+      granted_to_roles     = optional(list(string))
+      granted_to_users     = optional(list(string))
+      schema_grants = optional(list(object({
+        all_privileges             = optional(bool)
+        with_grant_option          = optional(bool, false)
+        privileges                 = optional(list(string), null)
+        all_schemas_in_database    = optional(bool, false)
+        future_schemas_in_database = optional(bool, false)
+        schema_name                = optional(string, null)
+      })))
+      table_grants             = optional(list(string))
+      external_table_grants    = optional(list(string))
+      view_grants              = optional(list(string))
+      materialized_view_grants = optional(list(string))
+      file_format_grants       = optional(list(string))
+      function_grants          = optional(list(string))
+      stage_grants             = optional(list(string))
+      task_grants              = optional(list(string))
+      procedure_grants         = optional(list(string))
+      sequence_grants          = optional(list(string))
+      stream_grants            = optional(list(string))
     })), {})
   }))
   default = {}
