@@ -113,7 +113,7 @@ variable "enable_console_output" {
 }
 
 variable "create_default_roles" {
-  description = "Whether the default database roles should be created"
+  description = "Whether the default roles should be created"
   type        = bool
   default     = false
 }
@@ -152,7 +152,7 @@ variable "schemas" {
     skip_schema_creation                          = optional(bool, false)
     descriptor_name                               = optional(string, "snowflake-schema")
     comment                                       = optional(string, null)
-    data_retention_time_in_days                   = optional(number, 1)
+    data_retention_time_in_days                   = optional(number, null)
     max_data_extension_time_in_days               = optional(number, null)
     is_transient                                  = optional(bool, null)
     with_managed_access                           = optional(bool, null)
