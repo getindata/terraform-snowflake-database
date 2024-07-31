@@ -21,7 +21,7 @@ locals {
     schema_grants        = []
   }
 
-  default_roles_definition = local.create_default_roles ? {
+  default_roles_definition = {
     readonly = {
       database_grants = {
         privileges = ["USAGE", "MONITOR"]
@@ -50,7 +50,7 @@ locals {
         future_schemas_in_database = true
       }]
     }
-  } : {}
+  }
 
   provided_roles = { for role_name, role in var.roles : role_name => {
     for k, v in role : k => v
@@ -64,9 +64,22 @@ locals {
     )
   }
 
-  roles = {
+  default_roles = {
     for role_name, role in local.roles_definition : role_name => role
-    if role_name != null && role.enabled
+    if contains(keys(local.default_roles_definition), role_name)
+  }
+
+  custom_roles = {
+    for role_name, role in local.roles_definition : role_name => role
+    if !contains(keys(local.default_roles_definition), role_name)
+  }
+
+  roles = {
+    for role_name, role in merge(
+      module.snowflake_default_role,
+      module.snowflake_custom_role
+    ) : role_name => role
+    if role_name != null
   }
 
   schemas = var.schemas

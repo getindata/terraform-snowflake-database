@@ -33,15 +33,17 @@ resource "snowflake_database" "this" {
   enable_console_output                         = var.enable_console_output
 }
 
-module "snowflake_database_role" {
-  for_each = local.roles
+module "snowflake_default_role" {
+  for_each = local.default_roles
 
   source  = "getindata/database-role/snowflake"
-  version = "1.1.0"
+  version = "1.1.1"
   context = module.this.context
 
-  database_name = one(snowflake_database.this[*].name)
-  name          = each.key
+  database_name   = one(snowflake_database.this[*].name)
+  name            = each.key
+  enabled         = local.create_default_roles && lookup(each.value, "enabled", true)
+  descriptor_name = lookup(each.value, "descriptor_name", "snowflake-role")
 
   granted_to_roles          = lookup(each.value, "granted_to_roles", [])
   granted_to_database_roles = lookup(each.value, "granted_to_database_roles", [])
@@ -50,6 +52,35 @@ module "snowflake_database_role" {
   schema_grants             = lookup(each.value, "schema_grants", [])
 
   attributes = [one(snowflake_database.this[*].name)]
+
+  depends_on = [
+    snowflake_database.this
+  ]
+}
+
+module "snowflake_custom_role" {
+  for_each = local.custom_roles
+
+  source  = "getindata/database-role/snowflake"
+  version = "1.1.1"
+  context = module.this.context
+
+  database_name   = one(snowflake_database.this[*].name)
+  name            = each.key
+  enabled         = lookup(each.value, "enabled", true)
+  descriptor_name = lookup(each.value, "descriptor_name", "snowflake-role")
+
+  granted_to_roles          = lookup(each.value, "granted_to_roles", [])
+  granted_to_database_roles = lookup(each.value, "granted_to_database_roles", [])
+  granted_database_roles    = lookup(each.value, "granted_database_roles", [])
+  database_grants           = lookup(each.value, "database_grants", {})
+  schema_grants             = lookup(each.value, "schema_grants", [])
+
+  attributes = [one(snowflake_database.this[*].name)]
+
+  depends_on = [
+    snowflake_database.this
+  ]
 }
 
 module "snowflake_schema" {
@@ -91,4 +122,8 @@ module "snowflake_schema" {
   roles  = each.value.roles
 
   create_default_roles = coalesce(each.value.create_default_roles, var.create_default_roles)
+
+  depends_on = [
+    snowflake_database.this
+  ]
 }
