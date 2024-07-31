@@ -1,15 +1,9 @@
-resource "snowflake_user" "dbt" {
-  name       = "DBT user"
-  login_name = "dbt_user"
-  comment    = "DBT user."
-}
-
 resource "snowflake_account_role" "admin_role" {
-  name = "admin"
+  name = "administrator"
 }
 
 resource "snowflake_account_role" "dev_role" {
-  name = "dev"
+  name = "developer"
 }
 
 module "prod_database" {
@@ -51,6 +45,9 @@ module "prod_database" {
         readonly = {
           granted_to_roles = [snowflake_account_role.dev_role.name]
         }
+        transformer = {
+          enabled = false
+        }
       }
     }
     silver = {
@@ -58,12 +55,18 @@ module "prod_database" {
         admin = {
           granted_to_roles = [snowflake_account_role.admin_role.name]
         }
+        transformer = {
+          enabled = false
+        }
       }
     }
     gold = {
       roles = {
         admin = {
           granted_to_roles = [snowflake_account_role.admin_role.name]
+        }
+        transformer = {
+          enabled = false
         }
       }
     }
