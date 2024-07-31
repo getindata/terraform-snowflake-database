@@ -25,7 +25,7 @@ variable "max_data_extension_time_in_days" {
 variable "is_transient" {
   description = "Specifies a database as transient. Transient databases do not have a Fail-safe period so they do not incur additional storage costs once they leave Time Travel; however, this means they are also not protected by Fail-safe in the event of a data loss"
   type        = bool
-  default     = false
+  default     = null
 }
 
 variable "external_volume" {
@@ -43,7 +43,7 @@ variable "catalog" {
 variable "replace_invalid_characters" {
   description = "Specifies whether to replace invalid UTF-8 characters with the Unicode replacement character () in query results for an Iceberg table"
   type        = bool
-  default     = false
+  default     = null
 }
 
 variable "default_ddl_collation" {
@@ -103,13 +103,13 @@ variable "user_task_timeout_ms" {
 variable "quoted_identifiers_ignore_case" {
   description = "If true, the case of quoted identifiers is ignored"
   type        = bool
-  default     = false
+  default     = null
 }
 
 variable "enable_console_output" {
   description = "If true, enables stdout/stderr fast path logging for anonymous stored procedures"
   type        = bool
-  default     = false
+  default     = null
 }
 
 variable "create_default_roles" {
@@ -172,19 +172,19 @@ variable "schemas" {
     enable_console_output                         = optional(bool, false)
     pipe_execution_paused                         = optional(bool, false)
     stages = optional(map(object({
-      enabled              = optional(bool, true)
-      descriptor_name      = optional(string, "snowflake-stage")
-      aws_external_id      = optional(string)
-      comment              = optional(string)
-      copy_options         = optional(string)
-      credentials          = optional(string)
-      directory            = optional(string)
-      encryption           = optional(string)
-      file_format          = optional(string)
-      snowflake_iam_user   = optional(string)
-      storage_integration  = optional(string)
-      url                  = optional(string)
-      create_default_roles = optional(bool)
+      enabled                    = optional(bool, true)
+      descriptor_name            = optional(string, "snowflake-stage")
+      aws_external_id            = optional(string)
+      comment                    = optional(string)
+      copy_options               = optional(string)
+      credentials                = optional(string)
+      directory                  = optional(string)
+      encryption                 = optional(string)
+      file_format                = optional(string)
+      snowflake_iam_user         = optional(string)
+      storage_integration        = optional(string)
+      url                        = optional(string)
+      create_default_stage_roles = optional(bool)
       roles = optional(map(object({
         enabled              = optional(bool, true)
         descriptor_name      = optional(string, "snowflake-role")
