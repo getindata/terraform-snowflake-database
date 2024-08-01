@@ -42,6 +42,7 @@ module "snowflake_default_role" {
 
   database_name   = one(snowflake_database.this[*].name)
   name            = each.key
+  comment         = lookup(each.value, "comment", null)
   enabled         = local.create_default_roles && lookup(each.value, "enabled", true)
   descriptor_name = lookup(each.value, "descriptor_name", "snowflake-role")
 
@@ -50,8 +51,7 @@ module "snowflake_default_role" {
   granted_database_roles    = lookup(each.value, "granted_database_roles", [])
   database_grants           = lookup(each.value, "database_grants", {})
   schema_grants             = lookup(each.value, "schema_grants", [])
-
-  attributes = [one(snowflake_database.this[*].name)]
+  schema_objects_grants     = lookup(each.value, "schema_objects_grants", {})
 
   depends_on = [
     snowflake_database.this
@@ -67,6 +67,7 @@ module "snowflake_custom_role" {
 
   database_name   = one(snowflake_database.this[*].name)
   name            = each.key
+  comment         = lookup(each.value, "comment", null)
   enabled         = lookup(each.value, "enabled", true)
   descriptor_name = lookup(each.value, "descriptor_name", "snowflake-role")
 
@@ -75,8 +76,7 @@ module "snowflake_custom_role" {
   granted_database_roles    = lookup(each.value, "granted_database_roles", [])
   database_grants           = lookup(each.value, "database_grants", {})
   schema_grants             = lookup(each.value, "schema_grants", [])
-
-  attributes = [one(snowflake_database.this[*].name)]
+  schema_objects_grants     = lookup(each.value, "schema_objects_grants", {})
 
   depends_on = [
     snowflake_database.this

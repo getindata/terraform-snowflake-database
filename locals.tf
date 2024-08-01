@@ -5,8 +5,7 @@ locals {
     lookup(module.database_label.descriptors, var.descriptor_name, module.database_label.id), "/${module.database_label.delimiter}${module.database_label.delimiter}+/", module.database_label.delimiter
   ), module.database_label.delimiter) : null
 
-  enabled              = module.this.enabled
-  create_default_roles = local.enabled && var.create_default_roles
+  create_default_roles = module.this.enabled && var.create_default_roles
 
   #This needs to be the same as an object in roles variable
   role_template = {
@@ -19,6 +18,20 @@ locals {
     granted_to_users     = []
     database_grants      = {}
     schema_grants        = []
+    schema_objects_grants = {
+      "TABLE"             = []
+      "DYNAMIC TABLE"     = []
+      "EXTERNAL TABLE"    = []
+      "VIEW"              = []
+      "MATERIALIZED VIEW" = []
+      "FILE FORMAT"       = []
+      "FUNCTION"          = []
+      "STAGE"             = []
+      "TASK"              = []
+      "PROCEDURE"         = []
+      "SEQUENCE"          = []
+      "STREAM"            = []
+    }
   }
 
   default_roles_definition = {
@@ -27,8 +40,9 @@ locals {
         privileges = ["USAGE", "MONITOR"]
       }
       schema_grants = [{
-        privileges              = ["USAGE"]
-        all_schemas_in_database = true
+        privileges                 = ["USAGE"]
+        all_schemas_in_database    = true
+        future_schemas_in_database = true
       }]
     }
     transformer = {
@@ -36,8 +50,9 @@ locals {
         privileges = ["USAGE", "MONITOR", "CREATE SCHEMA"]
       }
       schema_grants = [{
-        privileges              = ["USAGE", "CREATE TEMPORARY TABLE", "CREATE TAG", "CREATE PIPE", "CREATE PROCEDURE", "CREATE MATERIALIZED VIEW", "CREATE TABLE", "CREATE FILE FORMAT", "CREATE STAGE", "CREATE TASK", "CREATE FUNCTION", "CREATE EXTERNAL TABLE", "CREATE SEQUENCE", "CREATE VIEW", "CREATE STREAM", "CREATE DYNAMIC TABLE"]
-        all_schemas_in_database = true
+        privileges                 = ["USAGE", "CREATE TEMPORARY TABLE", "CREATE TAG", "CREATE PIPE", "CREATE PROCEDURE", "CREATE MATERIALIZED VIEW", "CREATE TABLE", "CREATE FILE FORMAT", "CREATE STAGE", "CREATE TASK", "CREATE FUNCTION", "CREATE EXTERNAL TABLE", "CREATE SEQUENCE", "CREATE VIEW", "CREATE STREAM", "CREATE DYNAMIC TABLE"]
+        all_schemas_in_database    = true
+        future_schemas_in_database = true
       }]
     }
     admin = {
