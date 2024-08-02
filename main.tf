@@ -87,7 +87,7 @@ module "snowflake_schema" {
   for_each = local.schemas
 
   source  = "getindata/schema/snowflake"
-  version = "2.0.0"
+  version = "2.0.1"
 
   context         = module.this.context
   enabled         = module.this.enabled && each.value.enabled

@@ -204,9 +204,6 @@ variable "schemas" {
         granted_database_roles    = optional(list(string))
         stage_grants              = optional(list(string))
         all_privileges            = optional(bool)
-        on_all                    = optional(bool, false)
-        schema_name               = optional(string)
-        on_future                 = optional(bool, false)
       })), {})
     })), {})
     roles = optional(map(object({
@@ -216,18 +213,10 @@ variable "schemas" {
       granted_to_roles          = optional(list(string))
       granted_to_database_roles = optional(list(string))
       granted_database_roles    = optional(list(string))
-      database_grants = optional(object({
+      schema_grants = optional(list(object({
         all_privileges    = optional(bool)
         with_grant_option = optional(bool, false)
         privileges        = optional(list(string), null)
-      }))
-      schema_grants = optional(list(object({
-        all_privileges             = optional(bool)
-        with_grant_option          = optional(bool, false)
-        privileges                 = optional(list(string), null)
-        all_schemas_in_database    = optional(bool, false)
-        future_schemas_in_database = optional(bool, false)
-        schema_name                = optional(string, null)
       })))
       schema_objects_grants = optional(map(list(object({
         all_privileges    = optional(bool)
@@ -235,7 +224,6 @@ variable "schemas" {
         privileges        = optional(list(string), null)
         object_name       = optional(string)
         on_all            = optional(bool, false)
-        schema_name       = optional(string)
         on_future         = optional(bool, false)
       }))), {})
     })), {})
