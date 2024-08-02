@@ -1,5 +1,5 @@
 descriptor_formats = {
-  snowflake-role = {
+  snowflake-database-role = {
     labels = ["attributes", "name"]
     format = "%v_%v"
   }

@@ -91,7 +91,7 @@ locals {
 
   roles = {
     for role_name, role in merge(
-      module.snowflake_default_role,
+      var.create_default_roles ? module.snowflake_default_role : {},
       module.snowflake_custom_role
     ) : role_name => role
     if role_name != null

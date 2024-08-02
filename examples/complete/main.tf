@@ -33,6 +33,7 @@ module "prod_database" {
   schemas = {
     bronze = {
       data_retention_time_in_days = 7
+      comment                     = "my bronze schema"
       stages = {
         example = {
           comment = "my example stage"
