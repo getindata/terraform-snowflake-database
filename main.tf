@@ -90,7 +90,7 @@ module "snowflake_schema" {
   version = "2.0.0"
 
   context         = module.this.context
-  enabled         = local.enabled && each.value.enabled
+  enabled         = module.this.enabled && each.value.enabled
   descriptor_name = each.value.descriptor_name
 
   name                = each.key
