@@ -88,7 +88,7 @@ output "enable_console_output" {
   value       = one(snowflake_database.this[*].enable_console_output)
 }
 
-output "roles" {
+output "database_roles" {
   description = "Snowflake Database roles"
   value       = local.roles
 }

@@ -68,7 +68,7 @@ module "snowflake_custom_role" {
   database_name   = one(snowflake_database.this[*].name)
   name            = each.key
   comment         = lookup(each.value, "comment", null)
-  enabled         = lookup(each.value, "enabled", true)
+  enabled         = module.this.enabled && lookup(each.value, "enabled", true)
   descriptor_name = lookup(each.value, "descriptor_name", "snowflake-role")
 
   granted_to_roles          = lookup(each.value, "granted_to_roles", [])

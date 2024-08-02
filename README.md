@@ -127,6 +127,7 @@ When upgrading from `v1.x`, expect most of the resources to be recreated - if re
 |------|-------------|
 | <a name="output_catalog"></a> [catalog](#output\_catalog) | The database parameter that specifies the default catalog to use for Iceberg tables |
 | <a name="output_data_retention_time_in_days"></a> [data\_retention\_time\_in\_days](#output\_data\_retention\_time\_in\_days) | Data retention days for the database |
+| <a name="output_database_roles"></a> [database\_roles](#output\_database\_roles) | Snowflake Database roles |
 | <a name="output_default_ddl_collation"></a> [default\_ddl\_collation](#output\_default\_ddl\_collation) | Specifies a default collation specification for all schemas and tables added to the database. |
 | <a name="output_enable_console_output"></a> [enable\_console\_output](#output\_enable\_console\_output) | If true, enables stdout/stderr fast path logging for anonymous stored procedures |
 | <a name="output_external_volume"></a> [external\_volume](#output\_external\_volume) | The database parameter that specifies the default external volume to use for Iceberg tables |
@@ -136,7 +137,6 @@ When upgrading from `v1.x`, expect most of the resources to be recreated - if re
 | <a name="output_name"></a> [name](#output\_name) | Name of the database |
 | <a name="output_quoted_identifiers_ignore_case"></a> [quoted\_identifiers\_ignore\_case](#output\_quoted\_identifiers\_ignore\_case) | If true, the case of quoted identifiers is ignored |
 | <a name="output_replace_invalid_characters"></a> [replace\_invalid\_characters](#output\_replace\_invalid\_characters) | Specifies whether to replace invalid UTF-8 characters with the Unicode replacement character () in query results for an Iceberg table |
-| <a name="output_roles"></a> [roles](#output\_roles) | Snowflake Database roles |
 | <a name="output_schemas"></a> [schemas](#output\_schemas) | This database schemas |
 | <a name="output_storage_serialization_policy"></a> [storage\_serialization\_policy](#output\_storage\_serialization\_policy) | The storage serialization policy for Iceberg tables that use Snowflake as the catalog. Valid options are: [COMPATIBLE OPTIMIZED] |
 | <a name="output_suspend_task_after_num_failures"></a> [suspend\_task\_after\_num\_failures](#output\_suspend\_task\_after\_num\_failures) | How many times a task must fail in a row before it is automatically suspended. 0 disables auto-suspending |
