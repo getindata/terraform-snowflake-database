@@ -97,3 +97,8 @@ output "schemas" {
   description = "This database schemas"
   value       = module.snowflake_schema
 }
+
+output "database_ownership_account_role_name" {
+  description = "The fully qualified name of the account role to which database ownership will be granted"
+  value       = one(snowflake_grant_ownership.database_ownership[*])
+}

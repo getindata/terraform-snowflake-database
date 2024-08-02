@@ -124,6 +124,22 @@ module "snowflake_schema" {
   create_default_roles = coalesce(each.value.create_default_roles, var.create_default_roles)
 
   depends_on = [
-    snowflake_database.this
+    module.snowflake_default_role,
+    module.snowflake_custom_role
+  ]
+}
+
+resource "snowflake_grant_ownership" "database_ownership" {
+  count = var.database_ownership_account_role_name != null ? 1 : 0
+
+  account_role_name   = var.database_ownership_account_role_name
+  outbound_privileges = "REVOKE"
+  on {
+    object_type = "DATABASE"
+    object_name = one(snowflake_database.this[*].name)
+  }
+
+  depends_on = [
+    module.snowflake_schema
   ]
 }
