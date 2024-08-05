@@ -10,7 +10,7 @@ locals {
   #This needs to be the same as an object in roles variable
   role_template = {
     enabled              = true
-    descriptor_name      = "snowflake-role"
+    descriptor_name      = "snowflake-database-role"
     comment              = null
     role_ownership_grant = "SYSADMIN"
     granted_roles        = []
