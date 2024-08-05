@@ -44,7 +44,7 @@ module "snowflake_default_role" {
   name            = each.key
   comment         = lookup(each.value, "comment", null)
   enabled         = local.create_default_roles && lookup(each.value, "enabled", true)
-  descriptor_name = lookup(each.value, "descriptor_name", "snowflake-role")
+  descriptor_name = lookup(each.value, "descriptor_name", "snowflake-database-role")
 
   granted_to_roles          = lookup(each.value, "granted_to_roles", [])
   granted_to_database_roles = lookup(each.value, "granted_to_database_roles", [])
@@ -69,7 +69,7 @@ module "snowflake_custom_role" {
   name            = each.key
   comment         = lookup(each.value, "comment", null)
   enabled         = module.this.enabled && lookup(each.value, "enabled", true)
-  descriptor_name = lookup(each.value, "descriptor_name", "snowflake-role")
+  descriptor_name = lookup(each.value, "descriptor_name", "snowflake-database-role")
 
   granted_to_roles          = lookup(each.value, "granted_to_roles", [])
   granted_to_database_roles = lookup(each.value, "granted_to_database_roles", [])
