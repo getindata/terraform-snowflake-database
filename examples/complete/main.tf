@@ -18,7 +18,7 @@ module "prod_database" {
 
   create_default_roles = true
 
-  database_ownership_account_role_name = snowflake_account_role.admin_role.name
+  database_ownership_grant = snowflake_account_role.admin_role.name
 
   roles = {
     readonly = {
