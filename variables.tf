@@ -231,8 +231,8 @@ variable "schemas" {
   default = {}
 }
 
-variable "database_ownership_account_role_name" {
-  description = "The fully qualified name of the account role to which database privileges will be granted"
+variable "database_ownership_grant" {
+  description = "The name of the account role to which database privileges will be granted"
   type        = string
   default     = null
 }

@@ -130,9 +130,9 @@ module "snowflake_schema" {
 }
 
 resource "snowflake_grant_ownership" "database_ownership" {
-  count = var.database_ownership_account_role_name != null ? 1 : 0
+  count = var.database_ownership_grant != null ? 1 : 0
 
-  account_role_name   = var.database_ownership_account_role_name
+  account_role_name   = var.database_ownership_grant
   outbound_privileges = "REVOKE"
   on {
     object_type = "DATABASE"
