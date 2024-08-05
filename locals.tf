@@ -5,8 +5,7 @@ locals {
     lookup(module.database_label.descriptors, var.descriptor_name, module.database_label.id), "/${module.database_label.delimiter}${module.database_label.delimiter}+/", module.database_label.delimiter
   ), module.database_label.delimiter) : null
 
-  enabled              = module.this.enabled
-  create_default_roles = local.enabled && var.create_default_roles
+  create_default_roles = module.this.enabled && var.create_default_roles
 
   #This needs to be the same as an object in roles variable
   role_template = {
@@ -17,21 +16,54 @@ locals {
     granted_roles        = []
     granted_to_roles     = []
     granted_to_users     = []
-    database_grants      = []
+    database_grants      = {}
     schema_grants        = []
+    schema_objects_grants = {
+      "TABLE"             = []
+      "DYNAMIC TABLE"     = []
+      "EXTERNAL TABLE"    = []
+      "VIEW"              = []
+      "MATERIALIZED VIEW" = []
+      "FILE FORMAT"       = []
+      "FUNCTION"          = []
+      "STAGE"             = []
+      "TASK"              = []
+      "PROCEDURE"         = []
+      "SEQUENCE"          = []
+      "STREAM"            = []
+    }
   }
+
   default_roles_definition = {
     readonly = {
-      database_grants = ["USAGE", "MONITOR"]
-      schema_grants   = ["USAGE"]
+      database_grants = {
+        privileges = ["USAGE", "MONITOR"]
+      }
+      schema_grants = [{
+        privileges                 = ["USAGE"]
+        all_schemas_in_database    = true
+        future_schemas_in_database = true
+      }]
     }
     transformer = {
-      database_grants = ["USAGE", "MONITOR", "CREATE SCHEMA"]
-      schema_grants   = ["USAGE", "CREATE TEMPORARY TABLE", "CREATE TAG", "CREATE PIPE", "CREATE PROCEDURE", "CREATE MATERIALIZED VIEW", "CREATE TABLE", "CREATE FILE FORMAT", "CREATE STAGE", "CREATE TASK", "CREATE FUNCTION", "CREATE EXTERNAL TABLE", "CREATE SEQUENCE", "CREATE VIEW", "CREATE STREAM", "CREATE DYNAMIC TABLE"]
+      database_grants = {
+        privileges = ["USAGE", "MONITOR", "CREATE SCHEMA"]
+      }
+      schema_grants = [{
+        privileges                 = ["USAGE", "CREATE TEMPORARY TABLE", "CREATE TAG", "CREATE PIPE", "CREATE PROCEDURE", "CREATE MATERIALIZED VIEW", "CREATE TABLE", "CREATE FILE FORMAT", "CREATE STAGE", "CREATE TASK", "CREATE FUNCTION", "CREATE EXTERNAL TABLE", "CREATE SEQUENCE", "CREATE VIEW", "CREATE STREAM", "CREATE DYNAMIC TABLE"]
+        all_schemas_in_database    = true
+        future_schemas_in_database = true
+      }]
     }
     admin = {
-      database_grants = ["ALL PRIVILEGES"]
-      schema_grants   = ["ALL PRIVILEGES"]
+      database_grants = {
+        all_privileges = true
+      }
+      schema_grants = [{
+        all_privileges             = true
+        all_schemas_in_database    = true
+        future_schemas_in_database = true
+      }]
     }
   }
 
@@ -59,10 +91,10 @@ locals {
 
   roles = {
     for role_name, role in merge(
-      module.snowflake_default_role,
+      var.create_default_roles ? module.snowflake_default_role : {},
       module.snowflake_custom_role
     ) : role_name => role
-    if role.name != null
+    if role_name != null
   }
 
   schemas = var.schemas

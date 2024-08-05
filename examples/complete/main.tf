@@ -1,21 +1,9 @@
-resource "snowflake_user" "dbt" {
-  name       = "DBT user"
-  login_name = "dbt_user"
-  comment    = "DBT user."
+resource "snowflake_account_role" "admin_role" {
+  name = "administrator"
 }
 
-module "snowflake_admin_role" {
-  source  = "getindata/role/snowflake"
-  version = "1.0.3"
-  context = module.this.context
-  name    = "admin"
-}
-
-module "snowflake_dev_role" {
-  source  = "getindata/role/snowflake"
-  version = "1.0.3"
-  context = module.this.context
-  name    = "dev"
+resource "snowflake_account_role" "dev_role" {
+  name = "developer"
 }
 
 module "prod_database" {
@@ -30,52 +18,60 @@ module "prod_database" {
 
   create_default_roles = true
 
+  database_ownership_grant = snowflake_account_role.admin_role.name
+
   roles = {
     readonly = {
-      granted_to_roles = [module.snowflake_dev_role.name]
+      granted_to_roles = [snowflake_account_role.dev_role.name]
+    }
+    transformer = {
+      enabled = false
     }
     admin = {
-      granted_to_roles = [module.snowflake_admin_role.name]
+      granted_to_roles = [snowflake_account_role.admin_role.name]
     }
   }
 
   schemas = {
     bronze = {
+      data_retention_time_in_days = 7
+      comment                     = "my bronze schema"
       stages = {
-        example = {}
+        example = {
+          comment = "my example stage"
+        }
       }
       roles = {
         admin = {
-          granted_to_roles = [module.snowflake_admin_role.name]
+          granted_to_roles = [snowflake_account_role.admin_role.name]
         }
         readonly = {
-          granted_to_roles = [module.snowflake_dev_role.name]
+          granted_to_roles = [snowflake_account_role.dev_role.name]
+        }
+        transformer = {
+          enabled = false
         }
       }
     }
     silver = {
       roles = {
         admin = {
-          granted_to_roles = [module.snowflake_admin_role.name]
+          granted_to_roles = [snowflake_account_role.admin_role.name]
+        }
+        transformer = {
+          enabled = false
         }
       }
     }
     gold = {
       roles = {
         admin = {
-          granted_to_roles = [module.snowflake_admin_role.name]
+          granted_to_roles = [snowflake_account_role.admin_role.name]
+        }
+        transformer = {
+          enabled = false
         }
       }
     }
   }
-}
-
-
-module "dev_database" {
-  source      = "../../"
-  context     = module.this.context
-  environment = "dev"
-
-  name          = "analytics"
-  from_database = module.prod_database.name
 }
