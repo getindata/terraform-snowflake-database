@@ -120,7 +120,7 @@ When upgrading from `v1.x`, expect most of the resources to be recreated - if re
 | <a name="module_roles_deep_merge"></a> [roles\_deep\_merge](#module\_roles\_deep\_merge) | Invicton-Labs/deepmerge/null | 0.1.5 |
 | <a name="module_snowflake_custom_role"></a> [snowflake\_custom\_role](#module\_snowflake\_custom\_role) | getindata/database-role/snowflake | 1.1.1 |
 | <a name="module_snowflake_default_role"></a> [snowflake\_default\_role](#module\_snowflake\_default\_role) | getindata/database-role/snowflake | 1.1.1 |
-| <a name="module_snowflake_schema"></a> [snowflake\_schema](#module\_snowflake\_schema) | getindata/schema/snowflake | 2.0.1 |
+| <a name="module_snowflake_schema"></a> [snowflake\_schema](#module\_snowflake\_schema) | getindata/schema/snowflake | 2.0.2 |
 | <a name="module_this"></a> [this](#module\_this) | cloudposse/label/null | 0.25.0 |
 
 ## Outputs
