@@ -1,17 +1,18 @@
-module "database_label" {
-  source  = "cloudposse/label/null"
-  version = "0.25.0"
-  context = module.this.context
+data "context_label" "this" {
+  delimiter  = local.context_template == null ? var.name_scheme.delimiter : null
+  properties = local.context_template == null ? var.name_scheme.properties : null
+  template   = local.context_template
 
-  delimiter           = coalesce(module.this.context.delimiter, "_")
-  regex_replace_chars = coalesce(module.this.context.regex_replace_chars, "/[^_a-zA-Z0-9]/")
-  label_value_case    = coalesce(module.this.context.label_value_case, "upper")
+  replace_chars_regex = var.name_scheme.replace_chars_regex
+
+  values = merge(
+    var.name_scheme.extra_values,
+    { name = var.name }
+  )
 }
 
 resource "snowflake_database" "this" {
-  count = module.this.enabled ? 1 : 0
-
-  name         = local.name_from_descriptor
+  name         = data.context_label.this.rendered
   is_transient = var.is_transient
   comment      = var.comment
 
@@ -31,20 +32,28 @@ resource "snowflake_database" "this" {
   user_task_minimum_trigger_interval_in_seconds = var.user_task_minimum_trigger_interval_in_seconds
   quoted_identifiers_ignore_case                = var.quoted_identifiers_ignore_case
   enable_console_output                         = var.enable_console_output
+  drop_public_schema_on_creation                = var.drop_public_schema_on_creation
+}
+moved {
+  from = snowflake_database.this[0]
+  to   = snowflake_database.this
 }
 
 module "snowflake_default_role" {
   for_each = local.default_roles
 
   source  = "getindata/database-role/snowflake"
-  version = "1.1.1"
-  context = module.this.context
+  version = "2.0.1"
 
-  database_name   = one(snowflake_database.this[*].name)
-  name            = each.key
-  comment         = lookup(each.value, "comment", null)
-  enabled         = local.create_default_roles && lookup(each.value, "enabled", true)
-  descriptor_name = lookup(each.value, "descriptor_name", "snowflake-database-role")
+  database_name     = snowflake_database.this.name
+  context_templates = var.context_templates
+
+  name = each.key
+  name_scheme = merge(
+    local.default_role_naming_scheme,
+    lookup(each.value, "name_scheme", {})
+  )
+  comment = lookup(each.value, "comment", null)
 
   granted_to_roles          = lookup(each.value, "granted_to_roles", [])
   granted_to_database_roles = lookup(each.value, "granted_to_database_roles", [])
@@ -62,14 +71,17 @@ module "snowflake_custom_role" {
   for_each = local.custom_roles
 
   source  = "getindata/database-role/snowflake"
-  version = "1.1.1"
-  context = module.this.context
+  version = "2.0.1"
 
-  database_name   = one(snowflake_database.this[*].name)
-  name            = each.key
-  comment         = lookup(each.value, "comment", null)
-  enabled         = module.this.enabled && lookup(each.value, "enabled", true)
-  descriptor_name = lookup(each.value, "descriptor_name", "snowflake-database-role")
+  database_name     = snowflake_database.this.name
+  context_templates = var.context_templates
+
+  name = each.key
+  name_scheme = merge(
+    local.default_role_naming_scheme,
+    lookup(each.value, "name_scheme", {})
+  )
+  comment = lookup(each.value, "comment", null)
 
   granted_to_roles          = lookup(each.value, "granted_to_roles", [])
   granted_to_database_roles = lookup(each.value, "granted_to_database_roles", [])
@@ -84,20 +96,25 @@ module "snowflake_custom_role" {
 }
 
 module "snowflake_schema" {
-  for_each = local.schemas
+  for_each = var.schemas
 
   source  = "getindata/schema/snowflake"
-  version = "2.0.2"
+  version = "3.0.0"
 
-  context         = module.this.context
-  enabled         = module.this.enabled && each.value.enabled
-  descriptor_name = each.value.descriptor_name
+  context_templates = var.context_templates
 
-  name                = each.key
+  name = each.key
+  name_scheme = merge({
+    extra_values = {
+      database = var.name
+    } },
+    lookup(each.value, "name_scheme", {})
+  )
+
   is_transient        = each.value.is_transient
   with_managed_access = each.value.with_managed_access
   comment             = each.value.comment
-  database            = one(snowflake_database.this[*].name)
+  database            = snowflake_database.this.name
 
   skip_schema_creation                          = each.value.skip_schema_creation
   data_retention_time_in_days                   = each.value.data_retention_time_in_days
@@ -123,10 +140,10 @@ module "snowflake_schema" {
 
   create_default_roles = coalesce(each.value.create_default_roles, var.create_default_roles)
 
-  depends_on = [
-    module.snowflake_default_role,
-    module.snowflake_custom_role
-  ]
+  # depends_on = [
+  #   module.snowflake_default_role,
+  #   module.snowflake_custom_role
+  # ]
 }
 
 resource "snowflake_grant_ownership" "database_ownership" {
@@ -136,9 +153,10 @@ resource "snowflake_grant_ownership" "database_ownership" {
   outbound_privileges = "REVOKE"
   on {
     object_type = "DATABASE"
-    object_name = one(snowflake_database.this[*].name)
+    object_name = snowflake_database.this.name
   }
 
+  # In order to create all resources before transferring ownership
   depends_on = [
     module.snowflake_schema
   ]

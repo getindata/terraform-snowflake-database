@@ -1,4 +1,9 @@
-output "prod_database" {
-  description = "Prod database module outputs"
-  value       = module.prod_database
+output "database" {
+  description = "Database module outputs"
+  value       = module.database
+}
+
+output "project_database" {
+  description = "Database module outputs"
+  value       = module.project_database
 }

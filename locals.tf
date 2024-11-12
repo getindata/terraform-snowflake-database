@@ -1,16 +1,16 @@
 locals {
-  # Get a name from the descriptor. If not available, use default naming convention.
-  # Trim and replace function are used to avoid bare delimiters on both ends of the name and situation of adjacent delimiters.
-  name_from_descriptor = module.database_label.enabled ? trim(replace(
-    lookup(module.database_label.descriptors, var.descriptor_name, module.database_label.id), "/${module.database_label.delimiter}${module.database_label.delimiter}+/", module.database_label.delimiter
-  ), module.database_label.delimiter) : null
+  context_template = lookup(var.context_templates, var.name_scheme.context_template_name, null)
 
-  create_default_roles = module.this.enabled && var.create_default_roles
+  default_role_naming_scheme = {
+    properties            = ["name"]
+    context_template_name = "snowflake-database-database-role"
+    extra_values = {
+      database = var.name
+    }
+  }
 
   #This needs to be the same as an object in roles variable
   role_template = {
-    enabled              = true
-    descriptor_name      = "snowflake-database-role"
     comment              = null
     role_ownership_grant = "SYSADMIN"
     granted_roles        = []
@@ -81,7 +81,7 @@ locals {
 
   default_roles = {
     for role_name, role in local.roles_definition : role_name => role
-    if contains(keys(local.default_roles_definition), role_name)
+    if contains(keys(local.default_roles_definition), role_name) && var.create_default_roles
   }
 
   custom_roles = {
@@ -96,8 +96,6 @@ locals {
     ) : role_name => role
     if role_name != null
   }
-
-  schemas = var.schemas
 }
 
 module "roles_deep_merge" {
