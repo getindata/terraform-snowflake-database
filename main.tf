@@ -61,10 +61,6 @@ module "snowflake_default_role" {
   database_grants           = lookup(each.value, "database_grants", {})
   schema_grants             = lookup(each.value, "schema_grants", [])
   schema_objects_grants     = lookup(each.value, "schema_objects_grants", {})
-
-  depends_on = [
-    snowflake_database.this
-  ]
 }
 
 module "snowflake_custom_role" {
@@ -89,10 +85,6 @@ module "snowflake_custom_role" {
   database_grants           = lookup(each.value, "database_grants", {})
   schema_grants             = lookup(each.value, "schema_grants", [])
   schema_objects_grants     = lookup(each.value, "schema_objects_grants", {})
-
-  depends_on = [
-    snowflake_database.this
-  ]
 }
 
 module "snowflake_schema" {
@@ -139,11 +131,6 @@ module "snowflake_schema" {
   roles  = each.value.roles
 
   create_default_roles = coalesce(each.value.create_default_roles, var.create_default_roles)
-
-  # depends_on = [
-  #   module.snowflake_default_role,
-  #   module.snowflake_custom_role
-  # ]
 }
 
 resource "snowflake_grant_ownership" "database_ownership" {
@@ -158,6 +145,8 @@ resource "snowflake_grant_ownership" "database_ownership" {
 
   # In order to create all resources before transferring ownership
   depends_on = [
-    module.snowflake_schema
+    module.snowflake_default_role,
+    module.snowflake_custom_role,
+    module.snowflake_schema,
   ]
 }
