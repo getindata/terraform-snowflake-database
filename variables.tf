@@ -1,7 +1,6 @@
-variable "descriptor_name" {
-  description = "Name of the descriptor used to form a resource name"
+variable "name" {
+  description = "Name of the resource"
   type        = string
-  default     = "snowflake-database"
 }
 
 variable "comment" {
@@ -121,8 +120,13 @@ variable "create_default_roles" {
 variable "roles" {
   description = "Roles created in the database scope"
   type = map(object({
-    enabled              = optional(bool, true)
-    descriptor_name      = optional(string, "snowflake-database-role")
+    name_scheme = optional(object({
+      properties            = optional(list(string))
+      delimiter             = optional(string)
+      context_template_name = optional(string)
+      replace_chars_regex   = optional(string)
+      extra_labels          = optional(map(string))
+    }))
     comment              = optional(string)
     role_ownership_grant = optional(string)
     granted_roles        = optional(list(string))
@@ -157,9 +161,14 @@ variable "roles" {
 variable "schemas" {
   description = "Schemas to be created in the database"
   type = map(object({
-    enabled                                       = optional(bool, true)
+    name_scheme = optional(object({
+      properties            = optional(list(string))
+      delimiter             = optional(string)
+      context_template_name = optional(string)
+      replace_chars_regex   = optional(string)
+      extra_labels          = optional(map(string))
+    }))
     skip_schema_creation                          = optional(bool, false)
-    descriptor_name                               = optional(string, "snowflake-schema")
     comment                                       = optional(string, null)
     data_retention_time_in_days                   = optional(number, null)
     max_data_extension_time_in_days               = optional(number, null)
@@ -182,8 +191,13 @@ variable "schemas" {
     pipe_execution_paused                         = optional(bool, null)
     create_default_roles                          = optional(bool)
     stages = optional(map(object({
-      enabled              = optional(bool, true)
-      descriptor_name      = optional(string, "snowflake-stage")
+      name_scheme = optional(object({
+        properties            = optional(list(string))
+        delimiter             = optional(string)
+        context_template_name = optional(string)
+        replace_chars_regex   = optional(string)
+        extra_labels          = optional(map(string))
+      }))
       aws_external_id      = optional(string)
       comment              = optional(string)
       copy_options         = optional(string)
@@ -196,8 +210,13 @@ variable "schemas" {
       url                  = optional(string)
       create_default_roles = optional(bool)
       roles = optional(map(object({
-        enabled                   = optional(bool, true)
-        descriptor_name           = optional(string, "snowflake-database-role")
+        name_scheme = optional(object({
+          properties            = optional(list(string))
+          delimiter             = optional(string)
+          context_template_name = optional(string)
+          replace_chars_regex   = optional(string)
+          extra_labels          = optional(map(string))
+        }))
         with_grant_option         = optional(bool)
         granted_to_roles          = optional(list(string))
         granted_to_database_roles = optional(list(string))
@@ -207,8 +226,13 @@ variable "schemas" {
       })), {})
     })), {})
     roles = optional(map(object({
-      enabled                   = optional(bool, true)
-      descriptor_name           = optional(string, "snowflake-database-role")
+      name_scheme = optional(object({
+        properties            = optional(list(string))
+        delimiter             = optional(string)
+        context_template_name = optional(string)
+        replace_chars_regex   = optional(string)
+        extra_labels          = optional(map(string))
+      }))
       comment                   = optional(string)
       granted_to_roles          = optional(list(string))
       granted_to_database_roles = optional(list(string))
@@ -235,4 +259,35 @@ variable "database_ownership_grant" {
   description = "The name of the account role to which database privileges will be granted"
   type        = string
   default     = null
+}
+
+variable "drop_public_schema_on_creation" {
+  description = "Whether the `PUBLIC` schema should be dropped after the database creation"
+  type        = bool
+  default     = true
+}
+
+variable "name_scheme" {
+  description = <<EOT
+  Naming scheme configuration for the resource. This configuration is used to generate names using context provider:
+    - `properties` - list of properties to use when creating the name - is superseded by `var.context_templates`
+    - `delimiter` - delimited used to create the name from `properties` - is superseded by `var.context_templates`
+    - `context_template_name` - name of the context template used to create the name
+    - `replace_chars_regex` - regex to use for replacing characters in property-values created by the provider - any characters that match the regex will be removed from the name
+    - `extra_values` - map of extra label-value pairs, used to create a name
+  EOT
+  type = object({
+    properties            = optional(list(string), ["environment", "name"])
+    delimiter             = optional(string, "_")
+    context_template_name = optional(string, "snowflake-database")
+    replace_chars_regex   = optional(string, "[^a-zA-Z0-9_]")
+    extra_values          = optional(map(string))
+  })
+  default = {}
+}
+
+variable "context_templates" {
+  description = "Map of context templates used for naming conventions - this variable supersedes `naming_scheme.properties` and `naming_scheme.delimiter` configuration"
+  type        = map(string)
+  default     = {}
 }

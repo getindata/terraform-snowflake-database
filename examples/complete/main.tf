@@ -6,26 +6,22 @@ resource "snowflake_account_role" "dev_role" {
   name = "developer"
 }
 
-module "prod_database" {
-  source      = "../../"
-  context     = module.this.context
-  environment = "prod"
+module "database" {
+  source = "../../"
 
-  name                        = "analytics"
-  comment                     = "my database"
+  context_templates = var.context_templates
+
+  name                        = "example_db"
+  comment                     = "test database"
   data_retention_time_in_days = 1
   is_transient                = false
 
-  create_default_roles = true
-
+  create_default_roles     = true
   database_ownership_grant = snowflake_account_role.admin_role.name
 
   roles = {
     readonly = {
       granted_to_roles = [snowflake_account_role.dev_role.name]
-    }
-    transformer = {
-      enabled = false
     }
     admin = {
       granted_to_roles = [snowflake_account_role.admin_role.name]
@@ -48,18 +44,12 @@ module "prod_database" {
         readonly = {
           granted_to_roles = [snowflake_account_role.dev_role.name]
         }
-        transformer = {
-          enabled = false
-        }
       }
     }
     silver = {
       roles = {
         admin = {
           granted_to_roles = [snowflake_account_role.admin_role.name]
-        }
-        transformer = {
-          enabled = false
         }
       }
     }
@@ -68,10 +58,21 @@ module "prod_database" {
         admin = {
           granted_to_roles = [snowflake_account_role.admin_role.name]
         }
-        transformer = {
-          enabled = false
-        }
       }
+    }
+  }
+}
+
+module "project_database" {
+  source = "../../"
+
+  context_templates = var.context_templates
+
+  name = "analytics"
+  name_scheme = {
+    context_template_name = "snowflake-project-database"
+    extra_values = {
+      project = "project"
     }
   }
 }
