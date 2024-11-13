@@ -23,9 +23,6 @@ module "database" {
     readonly = {
       granted_to_roles = [snowflake_account_role.dev_role.name]
     }
-    transformer = {
-      enabled = false
-    }
     admin = {
       granted_to_roles = [snowflake_account_role.admin_role.name]
     }
@@ -47,9 +44,6 @@ module "database" {
         readonly = {
           granted_to_roles = [snowflake_account_role.dev_role.name]
         }
-        transformer = {
-          enabled = false
-        }
       }
     }
     silver = {
@@ -57,18 +51,12 @@ module "database" {
         admin = {
           granted_to_roles = [snowflake_account_role.admin_role.name]
         }
-        transformer = {
-          enabled = false
-        }
       }
     }
     gold = {
       roles = {
         admin = {
           granted_to_roles = [snowflake_account_role.admin_role.name]
-        }
-        transformer = {
-          enabled = false
         }
       }
     }
