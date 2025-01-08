@@ -35,6 +35,9 @@ module "database" {
       stages = {
         example = {
           comment = "my example stage"
+          name_scheme = {
+            uppercase = false
+          }
         }
       }
       roles = {
@@ -43,6 +46,9 @@ module "database" {
         }
         readonly = {
           granted_to_roles = [snowflake_account_role.dev_role.name]
+          name_scheme = {
+            uppercase = false
+          }
         }
       }
     }
@@ -74,5 +80,14 @@ module "project_database" {
     extra_values = {
       project = "project"
     }
+    uppercase = false
   }
+
+
+  comment                     = "test database"
+  data_retention_time_in_days = 1
+  is_transient                = false
+
+  create_default_roles     = true
+  database_ownership_grant = snowflake_account_role.admin_role.name
 }
