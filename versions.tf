@@ -3,7 +3,7 @@ terraform {
   required_providers {
     snowflake = {
       source  = "Snowflake-Labs/snowflake"
-      version = "~> 0.95"
+      version = ">= 0.95"
     }
     context = {
       source  = "cloudposse/context"

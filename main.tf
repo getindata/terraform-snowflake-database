@@ -12,7 +12,7 @@ data "context_label" "this" {
 }
 
 resource "snowflake_database" "this" {
-  name         = data.context_label.this.rendered
+  name         = var.name_scheme.uppercase ? upper(data.context_label.this.rendered) : data.context_label.this.rendered
   is_transient = var.is_transient
   comment      = var.comment
 
@@ -43,7 +43,7 @@ module "snowflake_default_role" {
   for_each = local.default_roles
 
   source  = "getindata/database-role/snowflake"
-  version = "2.0.1"
+  version = "2.1.0"
 
   database_name     = snowflake_database.this.name
   context_templates = var.context_templates
@@ -67,7 +67,7 @@ module "snowflake_custom_role" {
   for_each = local.custom_roles
 
   source  = "getindata/database-role/snowflake"
-  version = "2.0.1"
+  version = "2.1.0"
 
   database_name     = snowflake_database.this.name
   context_templates = var.context_templates
@@ -91,12 +91,13 @@ module "snowflake_schema" {
   for_each = var.schemas
 
   source  = "getindata/schema/snowflake"
-  version = "3.0.0"
+  version = "3.1.0"
 
   context_templates = var.context_templates
 
   name = each.key
   name_scheme = merge({
+    uppercase = var.name_scheme.uppercase
     extra_values = {
       database = var.name
     } },
@@ -137,7 +138,7 @@ resource "snowflake_grant_ownership" "database_ownership" {
   count = var.database_ownership_grant != null ? 1 : 0
 
   account_role_name   = var.database_ownership_grant
-  outbound_privileges = "REVOKE"
+  outbound_privileges = "COPY"
   on {
     object_type = "DATABASE"
     object_name = snowflake_database.this.name
