@@ -91,7 +91,7 @@ module "snowflake_schema" {
   for_each = var.schemas
 
   source  = "getindata/schema/snowflake"
-  version = "3.1.0"
+  version = "3.1.1"
 
   context_templates = var.context_templates
 
