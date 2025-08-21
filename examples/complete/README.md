@@ -54,6 +54,6 @@ terraform apply tfplan
 
 | Name | Type |
 |------|------|
-| [snowflake_account_role.admin_role](https://registry.terraform.io/providers/Snowflake-Labs/snowflake/latest/docs/resources/account_role) | resource |
-| [snowflake_account_role.dev_role](https://registry.terraform.io/providers/Snowflake-Labs/snowflake/latest/docs/resources/account_role) | resource |
+| [snowflake_account_role.admin_role](https://registry.terraform.io/providers/snowflakedb/snowflake/latest/docs/resources/account_role) | resource |
+| [snowflake_account_role.dev_role](https://registry.terraform.io/providers/snowflakedb/snowflake/latest/docs/resources/account_role) | resource |
 <!-- END_TF_DOCS -->
