@@ -69,6 +69,7 @@ module "database" {
   }
 }
 
+# This configuration might be used with "Standard" Snowflake edition, where MATERIALIZED VIEWs are not supported.
 module "project_database" {
   source = "../../"
 
@@ -90,4 +91,34 @@ module "project_database" {
 
   create_default_roles     = true
   database_ownership_grant = snowflake_account_role.admin_role.name
+
+  schemas = {
+    test = {
+      roles = {
+        transformer = {
+          schema_grants = [{
+            privileges = [
+              "CREATE TEMPORARY TABLE",
+              "CREATE TAG",
+              "CREATE PIPE",
+              "CREATE PROCEDURE",
+              "USAGE",
+              "CREATE TABLE",
+              "CREATE FILE FORMAT",
+              "CREATE STAGE",
+              "CREATE TASK",
+              "CREATE FUNCTION",
+              "CREATE EXTERNAL TABLE",
+              "CREATE SEQUENCE",
+              "CREATE VIEW",
+              "CREATE STREAM"
+            ]
+          }]
+          schema_objects_grants = {
+            "MATERIALIZED VIEW" = []
+          }
+        }
+      }
+    }
+  }
 }
