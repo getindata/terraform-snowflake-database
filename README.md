@@ -117,6 +117,52 @@ List od code and variable (API) changes:
 
   For more information about preview features, refer to the [Snowflake provider documentation](https://registry.terraform.io/providers/snowflakedb/snowflake/latest/docs/resources/stage#preview-features) and [Snowflake stage resource documentation](https://registry.terraform.io/providers/snowflakedb/snowflake/latest/docs/resources/stage).
 
+## Known limitations
+
+### Standard Snowflake Edition
+
+When using "Standard" Snowflake Edition, `transformer` "default role" for schema might be failing, due to lack of support for `MATERIALIZED VIEW`. it can be easily workaround by overwriting default role definition:
+
+```hcl
+module "project_database" {
+  source = "getindata/database/snowflake"
+  # version  = "x.x.x"
+
+  create_default_roles     = true
+
+  schemas = {
+    test = {
+      roles = {
+        transformer = {
+          schema_grants = [{
+            privileges = [
+              "CREATE TEMPORARY TABLE",
+              "CREATE TAG",
+              "CREATE PIPE",
+              "CREATE PROCEDURE",
+              "USAGE",
+              "CREATE TABLE",
+              "CREATE FILE FORMAT",
+              "CREATE STAGE",
+              "CREATE TASK",
+              "CREATE FUNCTION",
+              "CREATE EXTERNAL TABLE",
+              "CREATE SEQUENCE",
+              "CREATE VIEW",
+              "CREATE STREAM"
+            ]
+          }]
+          schema_objects_grants = {
+            "MATERIALIZED VIEW" = []
+          }
+        }
+      }
+    }
+  }
+}
+
+```
+
 <!-- BEGIN_TF_DOCS -->
 
 
